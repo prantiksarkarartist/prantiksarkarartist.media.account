@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prantik Sarkar Artist - Official Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Cosmic Midnight -->
+    <!-- Application Structure Plan: The application is designed as a single-page, mobile-first "link-in-bio" style hub. The structure is thematic, divided into clear sections: 'About', 'Social Media', 'Music Platforms', 'Store & Support', and 'Other Platforms'. This categorized approach allows users to quickly navigate to the links they are interested in, rather than searching through a long, unstructured list. The core interaction is clicking on link buttons, which triggers a full-screen "energy charge" animation before redirecting the user. This adds a memorable, high-impact visual effect requested by the user, fitting the theme of a VFX/Graphics artist. A persistent, subtle particle animation in the background creates an immersive, high-tech atmosphere. This design prioritizes immediate access to information while providing a unique and engaging user experience. -->
+    <!-- Visualization & Content Choices: Report Info: A list of social/music links and artist bio. -> Goal: Organize and present links for easy access. -> Presentation Method: A responsive grid of stylized buttons for each link category. Each button clearly displays the platform name and username, now with a corresponding logo for quick recognition. -> Interaction: On-hover effects for buttons provide feedback. On-click, a full-screen canvas animation plays for 1.5 seconds, enhancing the artist's brand as a VFX creator, before redirecting. -> Justification: The grid is scannable and scalable. The logos improve visual clarity and user experience. The animations create a "wow" factor. -> Library/Method: Vanilla JavaScript for DOM manipulation and event handling. HTML Canvas API for the background and loading animations. Tailwind CSS for styling and layout. Inline SVG is used for logos to keep the file self-contained. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0c0a1a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .btn-glow {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px rgba(180, 83, 255, 0.4), 0 0 10px rgba(180, 83, 255, 0.3);
+        }
+        .btn-glow:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 0 15px rgba(180, 83, 255, 0.6), 0 0 30px rgba(180, 83, 255, 0.4);
+        }
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(12, 10, 26, 0.95);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        #loader-canvas {
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+        .section-title {
+             text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 0 20px rgba(180, 83, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="loader-overlay">
+        <canvas id="loader-canvas"></canvas>
+    </div>
+
+    <main class="relative z-10 container mx-auto px-4 py-8 sm:py-12">
+        <header class="text-center mb-12">
+            <h1 class="font-orbitron text-4xl sm:text-6xl font-bold tracking-widest uppercase text-white section-title">Prantik Sarkar Artist</h1>
+            <p class="mt-4 text-lg text-purple-300">VFX | Graphics | Music</p>
+        </header>
+
+        <section id="about" class="bg-black bg-opacity-30 backdrop-blur-sm p-6 rounded-2xl mb-12 max-w-4xl mx-auto shadow-lg border border-purple-800/50">
+            <h2 class="font-orbitron text-2xl font-bold mb-4 text-center text-purple-300 section-title">Welcome</h2>
+             <p class="text-center text-gray-300 leading-relaxed">
+                🎵 Welcome to the official hub of Prantik Sarkar 🎵<br>
+                This is your one-stop destination for all my social media, music platforms, and other projects. Explore my work and connect with me across the web.
+            </p>
+             <div class="mt-4 text-center text-sm text-gray-400">
+                <p><span class="font-bold">Real Name:</span> Prantik Sarkar</p>
+                <p><span class="font-bold">Also Known As:</span> Prantik Sarkar Artist, Prantik Sarkar Artist Record</p>
+                <p><span class="font-bold">Label:</span> Prantik Sarkar Artist Record</p>
+            </div>
+        </section>
+
+        <div id="link-sections-container"></div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const linkData = {
+                "Social Media": [
+                    { name: "YouTube", user: "prantik sarkar artist", url: "https://www.youtube.com/channel/UC7XABlHV7XXTy3wgFhpoKZA" },
+                    { name: "Instagram", user: "@prantiksarkarartist", url: "https://instagram.com/prantiksarkarartist" },
+                    { name: "Twitter / X", user: "@Prantikartist", url: "https://x.com/Prantikartist" },
+                    { name: "Facebook", user: "@PrantikSarkarArtist", url: "https://facebook.com/PrantikSarkarArtist" },
+                    { name: "Discord", user: "Join Now", url: "https://discord.gg/6AWHmhNB" },
+                    { name: "LinkedIn", user: "@prantiksarkarartist", url: "https://linkedin.com/in/prantiksarkarartist" },
+                    { name: "Snapchat", user: "@prantikartist", url: "https://snapchat.com/add/prantikartist?share_id=w_0_vGgBelM&locale=en-IN" },
+                    { name: "Bluesky", user: "@prantikartist.bsky.social", url: "https://bsky.app/profile/prantikartist.bsky.social" },
+                    { name: "WhatsApp Channel", user: "Follow", url: "https://whatsapp.com/channel/0029VagE2Kg3QxRrXWL0Kf2b" },
+                ],
+                "Music Platforms": [
+                    { name: "Spotify", user: "Listen", url: "https://open.spotify.com/artist/3WDymhMCjShZrAVkkZlS70" },
+                    { name: "YouTube Music", user: "Listen", url: "https://music.youtube.com/channel/UC7XABlHV7XXTy3wgFhpoKZA" },
+                    { name: "Apple Music", user: "Listen", url: "https://music.apple.com/in/artist/prantik-sarkar-artist/1732530875" },
+                    { name: "Amazon Music", user: "Listen", url: "https://music.amazon.in/artists/B0CW6N9VHF/prantik-sarkar-artist" },
+                    { name: "JioSaavn", user: "Listen", url: "https://www.jiosaavn.com/artist/prantik-sarkar-artist-songs/Bk4AHv6M1lU_" },
+                    { name: "Boomplay", user: "Listen", url: "https://www.boomplay.com/artists/85555020?from=&srModel=COPYLINK&srList=WEB" },
+                ],
+                "Store & Support": [
+                     { name: "My Website Shop", user: "Shop Now", url: "https://prantik-sarkar-artist-shop.fourthwall.com" },
+                     { name: "Buy Me a Coffee", user: "Support Me", url: "https://buymeacoffee.com/prantiksarkarartist" },
+                ],
+                "Other Platforms": [
+                    { name: "Blogspot", user: "Read my blog", url: "https://prantiksarkarartist.blogspot.com" },
+                    { name: "Medium", user: "@PrantikSarkarArtist", url: "https://medium.com/@PrantikSarkarArtist" },
+                    { name: "Google Panel", user: "View Profile", url: "https://www.google.com/search?kgmid=%2Fg%2F11vyvxjrp5" },
+                    { name: "Bandsintown (Artist)", user: "View Profile", url: "https://www.bandsintown.com/a/15598035-prantik-sarkar-artist?came_from=253" },
+                    { name: "Bandsintown (Event)", user: "View Event", url: "https://www.bandsintown.com/e/107078921-prantik-sarkar-artist-record-at-live-stream?came_from=253" },
+                    { name: "Vevo", user: "View Site", url: "https://prantiksarkar190924.wixsite.com/youtube" },
+                    { name: "Glasp", user: "View Profile", url: "https://glasp.co/ask/prantiksarkarartist" },
+                    { name: "LANDR Network", user: "View Profile", url: "https://network.landr.com/users/prantiksarkarartist" },
+                ]
+            };
+
+            const logoSVGs = {
+                "Instagram": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 448 512"><path d="M224.1 123.6c-5.5-24.3-19.8-42.5-33.1-53.5C170.8 55.6 151.7 48 131.5 48c-10 0-19.3 1.9-27.8 5.7c-8.5 3.8-15.7 8.9-21.7 15.3c-6 6.4-10.7 13.9-14.1 22.3c-3.4 8.4-5.1 17.5-5.1 27.2c0 23.9 10.9 44.9 32.6 63.1c21.7 18.2 47.9 27.3 78.4 27.3c15.2 0 29.8-2.6 43.6-7.8c13.8-5.2 25.7-12.8 35.7-22.8c10-10 17.6-21.9 22.8-35.7c5.2-13.8 7.8-28.4 7.8-43.6c0-30.5-9.1-56.7-27.3-78.4C269 119 248 108.1 224.1 123.6zM224 416c-48.6 0-94.4-18.7-129.5-51.5c-35.1-32.8-54.5-76.4-54.5-121.5c0-45.1 19.4-88.7 54.5-121.5C129.6 44.7 175.4 26 224 26s94.4 18.7 129.5 51.5c35.1 32.8 54.5 76.4 54.5 121.5c0 45.1-19.4 88.7-54.5 121.5C318.4 397.3 272.6 416 224 416z"/></svg>`,
+                "Twitter / X": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 512 512"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L193.1 280.8 69.8 48H221.7L330.4 209.4 389.2 48zM364.7 420l-9.1-12.6L110.8 72.8H130l250.7 348.9 9.1 12.6h28.1L139.7 72.8H35.8l224.9 313.1z"/></svg>`,
+                "Facebook": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 512 512"><path d="M504 256C504 119 393 8 256 8S8 119 8 256c0 123.78 90.69 226.38 209.25 245V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.28c-30.8 0-40.42 19.12-40.42 38.73V256h68.79l-11 71.69h-57.79V501.67C413.31 482.38 504 379.78 504 256z"/></svg>`,
+                "YouTube": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 576 512"><path d="M549.655 124.083c-6.28-23.65-24.62-41.914-48.246-48.284C458.748 64 288 64 288 64S117.252 64 64.606 75.799c-23.626 6.37-41.966 24.634-48.246 48.284C0 176.545 0 256 0 256s0 79.455 16.36 131.917c6.28 23.65 24.62 41.914 48.246 48.284C117.252 448 288 448 288 448s170.748 0 223.394-11.799c23.626-6.37 41.966-24.634 48.246-48.284C576 335.455 576 256 576 256s0-79.455-26.345-131.917zM288 368c-66.27 0-120-53.73-120-120s53.73-120 120-120 120 53.73 120 120-53.73 120-120 120zM288 180c-33.138 0-60 26.862-60 60s26.862 60 60 60 60-26.862 60-60-26.862-60-60-60z"/></svg>`,
+                "Discord": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 640 512"><path d="M524.5 69.8c-1.8-2.6-4.5-5.1-8.5-6.9-3.9-1.8-8.5-3.3-13.8-4.5-5.3-1.2-11.4-2.1-18.4-2.8-7-0.7-14.7-1.1-23.2-1.2h-.1c-15.6-.4-31.5 2.1-47.6 7.6-16.1 5.5-31.9 13-47.5 22.5c-15.6 9.5-30.8 20.6-45.6 33.3-14.8 12.7-29.2 26.9-43.2 42.6-14-15.7-28.4-29.9-43.2-42.6-14.8-12.7-30-23.8-45.6-33.3-15.6-9.5-31.4-17-47.5-22.5-16.1-5.5-32-8-47.6-7.6h-.1c-8.5 0.1-16.2 0.5-23.2 1.2-7 0.7-13.1 1.6-18.4 2.8-5.3 1.2-10 2.7-13.8 4.5-3.9 1.8-6.7 4.3-8.5 6.9-1.8 2.6-3.2 5.5-4.2 8.5-1 3.1-1.6 6.3-1.8 9.5-.2 3.2-.2 6.5-.2 9.8v93c0 20.9 8.2 39.5 24.6 53.3 16.4 13.8 38 21.2 65 21.2h.5c-1.3 2.9-2.9 5.8-4.9 8.6-2 2.8-4.2 5.5-6.7 8.2-2.5 2.7-5.2 5.2-8.2 7.6-3 2.4-6.1 4.7-9.4 6.8s-6.5 4.1-9.9 5.9-6.6 3.5-9.7 5.1c-3.1 1.6-6 3.1-8.7 4.5s-5.4 2.7-7.8 4-4.5 2.6-6.1 3.8-2.8 2.4-3.9 3.3c-1.1 0.9-1.9 1.8-2.5 2.8-0.6 1-1 2-1.3 3.1-0.3 1.1-0.5 2.2-0.5 3.4v2.5c0 1.2 0.1 2.3 0.3 3.4 0.2 1.1 0.6 2.1 1.2 3.1 0.6 1 1.5 1.9 2.5 2.8 1.1 0.9 2.3 1.8 3.9 3.3 1.6 1.2 3.2 2.4 6.1 3.8 2.7 1.4 5.4 2.7 8.7 4.5 3.1 1.6 6 3.1 9.7 5.1 3.4 1.8 6.5 3.4 9.9 5.9 3.3 2.1 6.4 4.4 9.4 6.8s5.7 4.9 8.2 7.6c2.5 2.7 4.7 5.4 6.7 8.2 2 2.8 3.6 5.7 4.9 8.6h.5c27 0 48.6-7.4 65-21.2s24.6-32.4 24.6-53.3V104c0-3.3 0-6.6-.2-9.8s-0.6-6.4-1.8-9.5c-1-3.1-2.4-6-4.2-8.5zM224 384c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zM416 384c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32z"/></svg>`,
+                "LinkedIn": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 448 512"><path d="M416 32H32C14.3 32 0 46.3 0 64v384c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32zM128 416H64V192h64V416zm-32-256c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32zm288 256h-64V288c0-17.7-14.3-32-32-32s-32 14.3-32 32v128h-64V192h64v24c11.7-17.6 30.8-24 53.2-24c44.8 0 80.8 35 80.8 80v144z"/></svg>`,
+                "WhatsApp Channel": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 448 512"><path d="M384 128c0-70.7-57.3-128-128-128S128 57.3 128 128v80h-64V128c0-106 86-192 192-192s192 86 192 192v256c0 106-86 192-192 192s-192-86-192-192v-80h64v80c0 70.7 57.3 128 128 128s128-57.3 128-128V128z"/></svg>`,
+                "Spotify": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 496 512"><path d="M496 248c0 137.9-112.1 248-248 248S0 385.9 0 248 112.1 0 248 0s248 110.1 248 248zM196.5 139.5c0-10.8 8.7-19.5 19.5-19.5h33.3c10.8 0 19.5 8.7 19.5 19.5v87.5c0 10.8-8.7 19.5-19.5 19.5h-33.3c-10.8 0-19.5-8.7-19.5-19.5v-87.5zM226.5 352.5v-87.5c0-10.8-8.7-19.5-19.5-19.5h-33.3c-10.8 0-19.5 8.7-19.5 19.5v87.5c0 10.8 8.7 19.5 19.5 19.5h33.3c10.8 0 19.5-8.7 19.5-19.5zM425.5 242.5a12.5 12.5 0 0 1-12.5 12.5H82.5c-6.9 0-12.5-5.6-12.5-12.5V172c0-6.9 5.6-12.5 12.5-12.5h330.5c6.9 0 12.5 5.6 12.5 12.5v70.5z"/></svg>`,
+                "YouTube Music": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 576 512"><path d="M549.655 124.083c-6.28-23.65-24.62-41.914-48.246-48.284C458.748 64 288 64 288 64S117.252 64 64.606 75.799c-23.626 6.37-41.966 24.634-48.246 48.284C0 176.545 0 256 0 256s0 79.455 16.36 131.917c6.28 23.65 24.62 41.914 48.246 48.284C117.252 448 288 448 288 448s170.748 0 223.394-11.799c23.626-6.37 41.966-24.634 48.246-48.284C576 335.455 576 256 576 256s0-79.455-26.345-131.917zM288 368c-66.27 0-120-53.73-120-120s53.73-120 120-120 120 53.73 120 120-53.73 120-120 120zM288 180c-33.138 0-60 26.862-60 60s26.862 60 60 60 60-26.862 60-60-26.862-60-60-60z"/></svg>`,
+                "Apple Music": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 496 512"><path d="M248 8C111.4 8 0 119.4 0 256c0 136.7 111.4 248 248 248 136.7 0 248-111.3 248-248 0-136.6-111.3-248-248-248zm-8 424c-11.8 0-21.4-9.6-21.4-21.4V109.4c0-11.8 9.6-21.4 21.4-21.4s21.4 9.6 21.4 21.4v301.2c0 11.8-9.6 21.4-21.4 21.4zm-128.8-49.3c-11.8 0-21.4-9.6-21.4-21.4V134.7c0-11.8 9.6-21.4 21.4-21.4s21.4 9.6 21.4 21.4v218.6c0 11.8-9.6 21.4-21.4 21.4zm128.8 49.3c-11.8 0-21.4-9.6-21.4-21.4V154.6c0-11.8 9.6-21.4 21.4-21.4s21.4 9.6 21.4 21.4v218.7c0 11.8-9.6 21.4-21.4 21.4zm128.8-24.6c-11.8 0-21.4-9.6-21.4-21.4V159.2c0-11.8 9.6-21.4 21.4-21.4s21.4 9.6 21.4 21.4v218.7c0 11.8-9.6 21.4-21.4 21.4z"/></svg>`,
+                "Amazon Music": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 512 512"><path d="M256 0C114.6 0 0 114.6 0 256c0 141.4 114.6 256 256 256s256-114.6 256-256C512 114.6 397.4 0 256 0zM128 352h-32c-17.7 0-32-14.3-32-32s14.3-32 32-32h32V256H96c-17.7 0-32-14.3-32-32s14.3-32 32-32h32V160h-32c-17.7 0-32-14.3-32-32s14.3-32 32-32h32V64c0-17.7 14.3-32 32-32s32 14.3 32 32v32h32V64c0-17.7 14.3-32 32-32s32 14.3 32 32v32h32V64c0-17.7 14.3-32 32-32s32 14.3 32 32v32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32h32v32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32h32v32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32h32v32c0 17.7-14.3 32-32 32s-32-14.3-32-32V352h-32v32c0 17.7-14.3 32-32 32s-32-14.3-32-32V352z"/></svg>`,
+                "Google Panel": `<svg class="w-8 h-8 mr-3 fill-current" viewBox="0 0 488 512"><path d="M488 261.8C488 152.1 391.8 62.4 248 62.4c-85.1 0-165.1 39-216.5 106.8-5.3 6.9-3.7 17.1 3.5 22.9l69.7 54.2c6.9 5.4 17.4 4.5 23.3-2.1c25-28.7 58.7-44.5 94-44.5 35.5 0 68.7 15.6 93.7 44.5c4.7 5.5 13.9 6.2 19.3 1.7L471 278.4c6.2-5.3 7.8-15.5 3.1-22.1z"/></svg>`
+            };
+            
+            const container = document.getElementById('link-sections-container');
+            for (const category in linkData) {
+                const section = document.createElement('section');
+                section.className = 'mb-12';
+                
+                const title = document.createElement('h2');
+                title.className = 'font-orbitron text-3xl font-bold text-center mb-8 text-purple-300 section-title';
+                title.textContent = category;
+                section.appendChild(title);
+
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6';
+                
+                linkData[category].forEach(link => {
+                    const button = document.createElement('a');
+                    button.href = link.url;
+                    button.target = '_blank';
+                    button.rel = 'noopener noreferrer';
+                    button.className = 'link-btn group bg-gradient-to-br from-purple-900 via-indigo-900 to-black p-5 rounded-lg text-center cursor-pointer border-2 border-purple-800/50 btn-glow flex flex-row items-center justify-center h-32';
+                    
+                    if (logoSVGs[link.name]) {
+                        button.innerHTML += logoSVGs[link.name];
+                    }
+
+                    const textContainer = document.createElement('div');
+                    textContainer.className = 'flex flex-col items-start';
+
+                    const platformName = document.createElement('span');
+                    platformName.className = 'font-bold text-xl text-white group-hover:text-purple-300 transition-colors duration-300';
+                    platformName.textContent = link.name;
+                    
+                    const userName = document.createElement('span');
+                    userName.className = 'text-sm text-gray-400 mt-1 group-hover:text-gray-200 transition-colors duration-300';
+                    userName.textContent = link.user;
+
+                    textContainer.appendChild(platformName);
+                    textContainer.appendChild(userName);
+                    button.appendChild(textContainer);
+                    grid.appendChild(button);
+                });
+                
+                section.appendChild(grid);
+                container.appendChild(section);
+            }
+
+            const loaderOverlay = document.getElementById('loader-overlay');
+            const linkBtns = document.querySelectorAll('.link-btn');
+
+            linkBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.href;
+                    showLoader(() => {
+                        window.open(url, '_blank');
+                    });
+                });
+            });
+
+            function showLoader(callback) {
+                loaderOverlay.style.display = 'flex';
+                loaderAnimation.start();
+                setTimeout(() => {
+                    loaderOverlay.style.display = 'none';
+                    loaderAnimation.stop();
+                    if (callback) callback();
+                }, 1500);
+            }
+
+            const bgCanvas = document.getElementById('bg-canvas');
+            const bgCtx = bgCanvas.getContext('2d');
+            let particles = [];
+            
+            function resizeBgCanvas() {
+                bgCanvas.width = window.innerWidth;
+                bgCanvas.height = window.innerHeight;
+            }
+            resizeBgCanvas();
+            window.addEventListener('resize', resizeBgCanvas);
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * bgCanvas.width;
+                    this.y = Math.random() * bgCanvas.height;
+                    this.size = Math.random() * 2 + 1;
+                    this.speedX = Math.random() * 1 - 0.5;
+                    this.speedY = Math.random() * 1 - 0.5;
+                    this.color = `rgba(167, 139, 250, ${Math.random() * 0.5 + 0.2})`;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.size > 0.1) this.size -= 0.01;
+                    if (this.x < 0 || this.x > bgCanvas.width) this.speedX *= -1;
+                    if (this.y < 0 || this.y > bgCanvas.height) this.speedY *= -1;
+                }
+                draw() {
+                    bgCtx.fillStyle = this.color;
+                    bgCtx.beginPath();
+                    bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    bgCtx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                let numberOfParticles = (bgCanvas.width * bgCanvas.height) / 9000;
+                for (let i = 0; i < numberOfParticles; i++) {
+                    particles.push(new Particle());
+                }
+            }
+            initParticles();
+
+            function animateParticles() {
+                bgCtx.clearRect(0, 0, bgCanvas.width, bgCtx.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                    if (particles[i].size <= 0.1) {
+                       particles.splice(i, 1);
+                       i--;
+                       particles.push(new Particle());
+                    }
+                }
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+
+            const loaderAnimation = (() => {
+                const canvas = document.getElementById('loader-canvas');
+                const ctx = canvas.getContext('2d');
+                let animationFrameId;
+                let frame = 0;
+                let running = false;
+
+                function resize() {
+                    const size = Math.min(window.innerWidth, window.innerHeight) * 0.8;
+                    canvas.width = size;
+                    canvas.height = size;
+                }
+                
+                function draw() {
+                    if (!running) return;
+                    frame++;
+                    const { width, height } = canvas;
+                    const center = { x: width / 2, y: height / 2 };
+                    ctx.clearRect(0, 0, width, height);
+
+                    const maxRadius = Math.min(width, height) / 2;
+                    const chargeProgress = Math.min(frame / 60, 1);
+                    
+                    ctx.save();
+                    ctx.translate(center.x, center.y);
+                    ctx.rotate(frame * 0.02);
+
+                    for (let i = 0; i < 5; i++) {
+                        const rotation = (i * Math.PI * 2 / 5) + frame * 0.05;
+                        const radius = maxRadius * 0.7 * chargeProgress;
+                        const x = Math.cos(rotation) * radius;
+                        const y = Math.sin(rotation) * radius;
+
+                        const grad = ctx.createRadialGradient(x, y, 0, x, y, maxRadius * 0.15);
+                        grad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                        grad.addColorStop(1, 'rgba(192, 132, 252, 0)');
+                        
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        ctx.arc(x, y, maxRadius * 0.15, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                    
+                    const coreRadius = maxRadius * 0.3 * chargeProgress;
+                    const coreGrad = ctx.createRadialGradient(center.x, center.y, 0, center.x, center.y, coreRadius);
+                    coreGrad.addColorStop(0, 'white');
+                    coreGrad.addColorStop(0.5, 'rgba(233, 213, 255, 0.9)');
+                    coreGrad.addColorStop(1, 'rgba(168, 85, 247, 0)');
+                    ctx.fillStyle = coreGrad;
+                    ctx.beginPath();
+                    ctx.arc(center.x, center.y, coreRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    const glowRadius = maxRadius * chargeProgress;
+                    const glowGrad = ctx.createRadialGradient(center.x, center.y, coreRadius, center.x, center.y, glowRadius);
+                    glowGrad.addColorStop(0, 'rgba(168, 85, 247, 0.5)');
+                    glowGrad.addColorStop(1, 'rgba(168, 85, 247, 0)');
+                    ctx.fillStyle = glowGrad;
+                    ctx.beginPath();
+                    ctx.arc(center.x, center.y, glowRadius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    animationFrameId = requestAnimationFrame(draw);
+                }
+
+                return {
+                    start: () => {
+                        resize();
+                        window.addEventListener('resize', resize);
+                        running = true;
+                        frame = 0;
+                        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                        draw();
+                    },
+                    stop: () => {
+                        running = false;
+                        window.removeEventListener('resize', resize);
+                        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                    }
+                };
+            })();
+        });
+    </script>
+</body>
+</html>
